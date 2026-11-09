@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --card-bg: #f9f9fb;
+            --card-border: #e9e9e9;
+            --text-color: #37352f;
+            --accent-color: #2eaadc;
+        }
+        /* Suporte ao Modo Escuro do Notion se preferir */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #191919;
+                --card-bg: #202020;
+                --card-border: #2f2f2f;
+                --text-color: #rgba(255, 255, 255, 0.9);
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Container do Flashcard com efeito 3D */
+        .flashcard-container {
+            width: 350px;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+            position: relative;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .back {
+            transform: rotateY(180deg);
+            background-color: rgba(46, 170, 220, 0.05);
+            border-color: var(--accent-color);
+        }
+
+        /* Botões de Navegação */
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .counter {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="flashcard-container" onclick="flipCard()">
+        <div class="flashcard" id="card">
+            <div class="front" id="card-front">Carregando...</div>
+            <div class="back" id="card-back">Carregando...</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="prevCard()">Anterior</button>
+        <span class="counter" id="counter">0 / 0</span>
+        <button onclick="nextCard()">Próximo</button>
+    </div>
+
+    <script>
+        // ==========================================
+        //  SUA TABELA DE DADOS (ADICIONE AQUI)
+        // ==========================================
+        const flashcardsData = [
+            { pergunta: "Qual é o atalho para abrir a busca rápida no Notion?", resposta: "Ctrl + P (ou Cmd + P no Mac)" },
+            { pergunta: "O que significa a sigla HTML?", resposta: "HyperText Markup Language" },
+            { pergunta: "Como criar uma lista de alternância nativa no Notion?", resposta: "Digite '>' seguido de espaço" },
+            { pergunta: "O código roda isolado dentro do Notion?", resposta: "Sim, ele roda em uma sandbox segura" }
+        ];
+
+        let currentIndex = 0;
+        const cardElement = document.getElementById('card');
+        const frontElement = document.getElementById('card-front');
+        const backElement = document.getElementById('card-back');
+        const counterElement = document.getElementById('counter');
+
+        function updateCard() {
+            // Remove o giro antes de trocar o texto
+            cardElement.classList.remove('flipped');
+            
+            // Pequeno atraso para atualizar o texto enquanto a carta desvira
+            setTimeout(() => {
+                frontElement.textContent = flashcardsData[currentIndex].pergunta;
+                backElement.textContent = flashcardsData[currentIndex].resposta;
+                counterElement.textContent = `${currentIndex + 1} / ${flashcardsData.length}`;
+            }, 150);
+        }
+
+        function flipCard() {
+            cardElement.classList.toggle('flipped');
+        }
+
+        function nextCard(event) {
+            if(event) event.stopPropagation(); // Impede de virar a carta ao clicar no botão
+            currentIndex = (currentIndex + 1) % flashcardsData.length;
+            updateCard();
+        }
+
+        function prevCard(event) {
+            if(event) event.stopPropagation(); // Impede de virar a carta ao clicar no botão
+            currentIndex = (currentIndex - 1 + flashcardsData.length) % flashcardsData.length;
+            updateCard();
+        }
+
+        // Inicializa o primeiro card
+        if(flashcardsData.length > 0) {
+            updateCard();
+        }
+    </script>
+</body>
+</html>

@@ -1,177 +1,107 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        :root {
-            --bg-color: #ffffff;
-            --card-bg: #f9f9fb;
-            --card-border: #e9e9e9;
-            --text-color: #37352f;
-            --accent-color: #2eaadc;
-        }
-        /* Suporte ao Modo Escuro do Notion se preferir */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #191919;
-                --card-bg: #202020;
-                --card-border: #2f2f2f;
-                --text-color: #rgba(255, 255, 255, 0.9);
-            }
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            padding: 20px;
-        }
-
-        /* Container do Flashcard com efeito 3D */
-        .flashcard-container {
-            width: 350px;
-            height: 220px;
-            perspective: 1000px;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-
-        .flashcard {
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-            transition: transform 0.6s ease;
-            position: relative;
-        }
-
-        .flashcard.flipped {
-            transform: rotateY(180deg);
-        }
-
-        .front, .back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 12px;
-            border: 1px solid var(--card-border);
-            background-color: var(--card-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            box-sizing: border-box;
-            text-align: center;
-            font-size: 1.1rem;
-            font-weight: 500;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
-
-        .back {
-            transform: rotateY(180deg);
-            background-color: rgba(46, 170, 220, 0.05);
-            border-color: var(--accent-color);
-        }
-
-        /* Botões de Navegação */
-        .controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        button {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: var(--text-color);
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        button:hover {
-            background-color: var(--accent-color);
-            color: white;
-            border-color: var(--accent-color);
-        }
-
-        .counter {
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meus Flashcards ♡</title>
+<style>
+:root{--pink:#ee91b2;--dark:#d8759a;--ink:#8b536b;--line:#f2c6d7}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:30px 16px;font-family:"Trebuchet MS",Arial,sans-serif;color:var(--ink);background:linear-gradient(145deg,#ffe8f1,#fff6fb 55%,#fce1ed)}
+.page{width:min(100%,960px);margin:auto;padding:34px clamp(16px,4vw,40px);background:#ffffffc9;border:3px solid white;border-radius:32px;box-shadow:0 18px 45px #be709429}
+header{text-align:center;margin-bottom:28px}h1{margin:0;color:#e58aaa;font-size:clamp(1.9rem,5vw,2.7rem)}header p,.muted{color:#b27b93}
+h2{color:#d8799d;font-size:1.25rem;margin:0 0 15px}
+.deck{text-align:center}.card-area{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 auto}
+.nav{width:42px;height:42px;flex:0 0 42px;border:0;border-radius:50%;background:#f9d6e4;color:#a85e7d;font-size:1.4rem;cursor:pointer}
+.nav:hover{background:#f4bfd3}
+.flashcard{width:min(100%,520px);min-height:220px;perspective:1000px;cursor:pointer;outline:none}
+.inner{position:relative;min-height:220px;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.7,.3,1)}
+.flashcard.flipped .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;min-height:220px;padding:25px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:3px solid white;border-radius:26px;box-shadow:0 10px 24px #be709426;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.front{background:linear-gradient(135deg,#ffe1ec,#fff0f6)}.back{background:linear-gradient(135deg,#f1e6ff,#fff0f7);transform:rotateY(180deg)}
+.face small{color:#c17c98;font-weight:bold;letter-spacing:.08em;text-transform:uppercase}.face strong{margin-top:14px;font-size:clamp(1.2rem,3vw,1.75rem);line-height:1.35;overflow-wrap:anywhere}
+.hint,.meta{color:#b27b93;font-size:.9rem}.divider{height:1px;margin:32px 0;background:linear-gradient(90deg,transparent,#f2c6d7,transparent)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;margin:18px 0 20px}
+label{display:block;margin-bottom:7px;font-weight:bold;font-size:.9rem}
+input{width:100%;min-width:0;padding:12px 14px;border:2px solid #f3d0de;border-radius:14px;outline:none;color:var(--ink);background:#fffafd;font:inherit}
+input:focus{border-color:var(--pink);box-shadow:0 0 0 3px #ee91b226}
+.primary{border:0;border-radius:999px;padding:13px 22px;background:var(--pink);color:white;font:bold .98rem "Trebuchet MS",Arial,sans-serif;cursor:pointer;box-shadow:0 5px 0 var(--dark);white-space:nowrap}
+.primary:hover{background:#e77fa5}.primary:active{transform:translateY(3px);box-shadow:0 2px 0 var(--dark)}
+.table-wrap{overflow-x:auto;border:2px solid #f6d9e4;border-radius:18px;background:#fffafd}
+table{width:100%;min-width:580px;border-collapse:collapse;text-align:left}th{padding:13px 15px;background:#ffeaf2;color:#b96888;font-size:.88rem}
+td{padding:13px 15px;border-top:1px solid #f7e2ea;vertical-align:middle;overflow-wrap:anywhere}tbody tr:hover{background:#fff5f9}
+.actions{display:flex;gap:6px}.small{border:1px solid #f0c5d6;border-radius:10px;padding:7px 9px;background:white;color:#a85e7d;font:inherit;font-size:.82rem;cursor:pointer}.small:hover{background:#ffeaf2}.delete{color:#b85d70}
+.empty{text-align:center;color:#b27b93;padding:24px}.status{text-align:center;min-height:20px;color:#b96888;font-size:.88rem}.foot{text-align:center;color:#bd8ba0;font-size:.85rem;margin:16px 0 0}
+@media(max-width:700px){body{padding:14px 9px}.page{padding:26px 14px;border-radius:25px}.form-grid{grid-template-columns:1fr}.primary{width:100%}.card-area{gap:7px}.nav{width:36px;height:36px;flex-basis:36px}.flashcard,.inner,.face{min-height:205px}}
+</style>
 </head>
 <body>
-
-    <div class="flashcard-container" onclick="flipCard()">
-        <div class="flashcard" id="card">
-            <div class="front" id="card-front">Carregando...</div>
-            <div class="back" id="card-back">Carregando...</div>
-        </div>
-    </div>
-
-    <div class="controls">
-        <button onclick="prevCard()">Anterior</button>
-        <span class="counter" id="counter">0 / 0</span>
-        <button onclick="nextCard()">Próximo</button>
-    </div>
-
-    <script>
-        // ==========================================
-        //  SUA TABELA DE DADOS (ADICIONE AQUI)
-        // ==========================================
-        const flashcardsData = [
-            { pergunta: "Qual é o atalho para abrir a busca rápida no Notion?", resposta: "Ctrl + P (ou Cmd + P no Mac)" },
-            { pergunta: "O que significa a sigla HTML?", resposta: "HyperText Markup Language" },
-            { pergunta: "Como criar uma lista de alternância nativa no Notion?", resposta: "Digite '>' seguido de espaço" },
-            { pergunta: "O código roda isolado dentro do Notion?", resposta: "Sim, ele roda em uma sandbox segura" }
-        ];
-
-        let currentIndex = 0;
-        const cardElement = document.getElementById('card');
-        const frontElement = document.getElementById('card-front');
-        const backElement = document.getElementById('card-back');
-        const counterElement = document.getElementById('counter');
-
-        function updateCard() {
-            // Remove o giro antes de trocar o texto
-            cardElement.classList.remove('flipped');
-            
-            // Pequeno atraso para atualizar o texto enquanto a carta desvira
-            setTimeout(() => {
-                frontElement.textContent = flashcardsData[currentIndex].pergunta;
-                backElement.textContent = flashcardsData[currentIndex].resposta;
-                counterElement.textContent = `${currentIndex + 1} / ${flashcardsData.length}`;
-            }, 150);
-        }
-
-        function flipCard() {
-            cardElement.classList.toggle('flipped');
-        }
-
-        function nextCard(event) {
-            if(event) event.stopPropagation(); // Impede de virar a carta ao clicar no botão
-            currentIndex = (currentIndex + 1) % flashcardsData.length;
-            updateCard();
-        }
-
-        function prevCard(event) {
-            if(event) event.stopPropagation(); // Impede de virar a carta ao clicar no botão
-            currentIndex = (currentIndex - 1 + flashcardsData.length) % flashcardsData.length;
-            updateCard();
-        }
-
-        // Inicializa o primeiro card
-        if(flashcardsData.length > 0) {
-            updateCard();
-        }
-    </script>
+<main class="page">
+<header><h1>Meus Flashcards <span style="color:#efb64e">♡</span></h1><p>Aprender pode ser leve, divertido e cheio de fofura!</p></header>
+<section class="deck">
+<h2>✿ Hora de estudar ✿</h2>
+<div class="card-area">
+<button class="nav" id="prev" type="button" aria-label="Cartão anterior">‹</button>
+<div class="flashcard" id="flashcard" role="button" tabindex="0" aria-label="Virar flashcard">
+<div class="inner">
+<div class="face front"><small>Pergunta</small><strong id="frontText">Adicione seu primeiro flashcard!</strong></div>
+<div class="face back"><small>Resposta</small><strong id="backText">Sua resposta aparecerá aqui ♡</strong></div>
+</div></div>
+<button class="nav" id="next" type="button" aria-label="Próximo cartão">›</button>
+</div>
+<p class="hint">Toque no cartão para revelar a resposta ✨</p><p class="meta" id="meta">0 cartões adicionados</p>
+</section>
+<div class="divider"></div>
+<section>
+<h2>♡ Sua coleção de cartões</h2>
+<p class="muted">Adicione uma pergunta e uma resposta. O flashcard será atualizado automaticamente!</p>
+<form id="form"><div class="form-grid">
+<div><label for="question">Frente do cartão</label><input id="question" maxlength="180" placeholder="Ex.: O que é HTML?" required></div>
+<div><label for="answer">Verso do cartão</label><input id="answer" maxlength="180" placeholder="Ex.: Linguagem de marcação..." required></div>
+<button class="primary" id="submit" type="submit">＋ Adicionar</button>
+</div></form>
+<div class="table-wrap"><table>
+<thead><tr><th style="width:7%">#</th><th>Frente</th><th>Verso</th><th style="width:150px">Ações</th></tr></thead>
+<tbody id="rows"><tr><td colspan="4" class="empty">Ainda não há cartões. Que tal criar o primeiro? ♡</td></tr></tbody>
+</table></div>
+<p class="status" id="status" aria-live="polite"></p><p class="foot">Feito com carinho e um pouquinho de magia ✧</p>
+</section>
+</main>
+<script>
+const cards=[];let current=0,editing=null;
+const $=id=>document.getElementById(id);
+function showCard(){
+ $('flashcard').classList.remove('flipped');
+ if(!cards.length){$('frontText').textContent='Adicione seu primeiro flashcard!';$('backText').textContent='Sua resposta aparecerá aqui ♡';$('meta').textContent='0 cartões adicionados';return}
+ current=Math.max(0,Math.min(current,cards.length-1));
+ $('frontText').textContent=cards[current].front;$('backText').textContent=cards[current].back;
+ $('meta').textContent=`Cartão ${current+1} de ${cards.length}`;
+}
+function render(){
+ showCard();const tbody=$('rows');tbody.replaceChildren();
+ if(!cards.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=4;td.className='empty';td.textContent='Ainda não há cartões. Que tal criar o primeiro? ♡';tr.append(td);tbody.append(tr);return}
+ cards.forEach((card,i)=>{
+  const tr=document.createElement('tr');[String(i+1),card.front,card.back].forEach(value=>{const td=document.createElement('td');td.textContent=value;tr.append(td)});
+  const td=document.createElement('td'),group=document.createElement('div');group.className='actions';
+  function action(label,cls,fn){const b=document.createElement('button');b.type='button';b.className='small '+(cls||'');b.textContent=label;b.addEventListener('click',fn);group.append(b)}
+  action('Ver','',()=>{current=i;showCard();$('flashcard').scrollIntoView({behavior:'smooth',block:'center'})});
+  action('Editar','',()=>{editing=i;$('question').value=card.front;$('answer').value=card.back;$('submit').textContent='Salvar alterações';$('question').focus();$('status').textContent=`Editando o cartão ${i+1}.`});
+  action('Excluir','delete',()=>{cards.splice(i,1);if(!cards.length)current=0;else if(i<current)current--;else if(current>=cards.length)current=cards.length-1;if(editing===i)reset();else if(editing!==null&&editing>i)editing--;render();$('status').textContent='Cartão excluído.'});
+  td.append(group);tr.append(td);tbody.append(tr);
+ });
+}
+function reset(){$('form').reset();editing=null;$('submit').textContent='＋ Adicionar'}
+$('form').addEventListener('submit',e=>{e.preventDefault();const front=$('question').value.trim(),back=$('answer').value.trim();if(!front||!back)return;
+ if(editing===null){cards.push({front,back});current=cards.length-1;$('status').textContent='Novo flashcard adicionado! ♡'}
+ else{cards[editing]={front,back};current=editing;$('status').textContent='Flashcard atualizado! ✨'}
+ reset();render();
+});
+function flip(){if(cards.length)$('flashcard').classList.toggle('flipped')}
+$('flashcard').addEventListener('click',flip);
+$('flashcard').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}});
+$('prev').addEventListener('click',()=>{if(cards.length){current=(current-1+cards.length)%cards.length;showCard()}});
+$('next').addEventListener('click',()=>{if(cards.length){current=(current+1)%cards.length;showCard()}});
+render();
+</script>
 </body>
 </html>

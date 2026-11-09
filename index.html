@@ -68,7 +68,24 @@ td{padding:13px 15px;border-top:1px solid #f7e2ea;vertical-align:middle;overflow
 </section>
 </main>
 <script>
-const cards=[];let current=0,editing=null;
+const STORAGE_KEY = 'flashcards_fofinhos';
+
+let cards = [];
+
+try {
+    cards = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+    if (!Array.isArray(cards)) {
+        cards = [];
+    }
+} catch (error) {
+    cards = [];
+}
+
+function saveCards() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+}
+let current=0,editing=null;
 const $=id=>document.getElementById(id);
 function showCard(){
  $('flashcard').classList.remove('flipped');
@@ -78,6 +95,7 @@ function showCard(){
  $('meta').textContent=`Cartão ${current+1} de ${cards.length}`;
 }
 function render(){
+ saveCards();
  showCard();const tbody=$('rows');tbody.replaceChildren();
  if(!cards.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=4;td.className='empty';td.textContent='Ainda não há cartões. Que tal criar o primeiro? ♡';tr.append(td);tbody.append(tr);return}
  cards.forEach((card,i)=>{

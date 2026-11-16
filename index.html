@@ -310,6 +310,37 @@
         background: #ffeaf2;
       }
 
+      .backup-fallback {
+        margin: 0 0 18px;
+        padding: 16px;
+        border: 1px solid #f2c6d7;
+        border-radius: 14px;
+        background: #fffafd;
+      }
+
+      .backup-fallback[hidden] {
+        display: none;
+      }
+
+      .backup-fallback p {
+        margin: 0 0 10px;
+        line-height: 1.5;
+      }
+
+      .backup-fallback textarea {
+        display: block;
+        width: 100%;
+        min-height: 160px;
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #f0c5d6;
+        border-radius: 10px;
+        color: var(--ink);
+        background: white;
+        font: 0.85rem monospace;
+        resize: vertical;
+      }
+
       .foot {
         text-align: center;
         color: #bd8ba0;
@@ -398,6 +429,11 @@
           <button class="secondary" id="exportBackup" type="button">Baixar backup</button>
           <button class="secondary" id="importBackup" type="button">Restaurar backup</button>
           <input id="backupFile" type="file" accept=".json,application/json" hidden />
+        </div>
+        <div class="backup-fallback" id="backupFallback" hidden>
+          <p>O Notion pode bloquear o download dentro da página incorporada. Copie o conteúdo abaixo e salve-o em um arquivo com extensão <strong>.json</strong>.</p>
+          <textarea id="backupText" aria-label="Conteúdo do backup JSON" readonly></textarea>
+          <button class="secondary" id="copyBackup" type="button">Copiar backup</button>
         </div>
 
         <form id="form">
@@ -573,7 +609,7 @@
             const saved = saveCards();
             render();
             $('status').textContent = saved
-              ? 'Cartão excluído.'
+              ? 'Cartão excluído! ♡'
               : 'Não foi possível salvar neste dispositivo. Baixe um backup para não perder as alterações.';
           });
 
@@ -609,7 +645,7 @@
           current = editing;
           const saved = saveCards();
           $('status').textContent = saved
-            ? 'Flashcard atualizado! ✨'
+            ? 'Flashcard atualizado! ♡'
             : 'Não foi possível salvar neste dispositivo. Baixe um backup para não perder as alterações.';
         }
 
@@ -617,16 +653,30 @@
         render();
       });
 
-      $('exportBackup').addEventListener('click', () => {
+      function createBackup() {
         const backup = {
           format: BACKUP_FORMAT,
           version: 1,
           exportedAt: new Date().toISOString(),
           cards,
         };
-        const blob = new Blob([JSON.stringify(backup, null, 2)], {
-          type: 'application/json',
-        });
+        return JSON.stringify(backup, null, 2);
+      }
+
+      $('exportBackup').addEventListener('click', () => {
+        const json = createBackup();
+
+        if (window.self !== window.top) {
+          $('backupText').value = json;
+          $('backupFallback').hidden = false;
+          $('backupText').focus();
+          $('backupText').select();
+          $('status').textContent =
+            'O download pode ser bloqueado pelo Notion. Copie o conteúdo do backup abaixo.';
+          return;
+        }
+
+        const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -634,6 +684,21 @@
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
         $('status').textContent = 'Backup dos flashcards baixado com sucesso.';
+      });
+
+      $('copyBackup').addEventListener('click', async () => {
+        const backupText = $('backupText');
+        backupText.focus();
+        backupText.select();
+
+        try {
+          await navigator.clipboard.writeText(backupText.value);
+          $('status').textContent =
+            'Backup copiado! Cole-o em um arquivo de texto e salve com a extensão .json.';
+        } catch (error) {
+          $('status').textContent =
+            'Não foi possível copiar automaticamente. O conteúdo está selecionado: copie-o e salve em um arquivo .json.';
+        }
       });
 
       $('importBackup').addEventListener('click', () => {
